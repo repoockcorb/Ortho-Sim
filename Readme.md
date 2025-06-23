@@ -14,6 +14,12 @@ An AFO is a support device intended to control the position and motion of the an
 
 There is an `auto_exe_builder.py` file that allows you to compile and build the executable to run on machines that don't have python installed. This uses the pyinstaller python library.
 
+
+## Load Cell Interface
+For developement the PhidgetBridge drivers below need to be installed for your system, select the appropriate one for your system. 
+- [⬇ 32-bit Phidget22 Driver Download](https://www.phidgets.com/downloads/phidget22/libraries/windows/Phidget22-x86.exe)
+- [⬇ 64-bit Phidget22 Driver Download](https://www.phidgets.com/downloads/phidget22/libraries/windows/Phidget22-x64.exe)
+
 # requirements.txt
 
 - aiohappyeyeballs==2.4.0
