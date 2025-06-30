@@ -20,6 +20,25 @@ For developement the PhidgetBridge drivers below need to be installed for your s
 - [⬇ 32-bit Phidget22 Driver Download](https://www.phidgets.com/downloads/phidget22/libraries/windows/Phidget22-x86.exe)
 - [⬇ 64-bit Phidget22 Driver Download](https://www.phidgets.com/downloads/phidget22/libraries/windows/Phidget22-x64.exe)
 
+# Design Changelog
+## Parts
+ - Motor - [Dual Shaft Motor - D6374 150 Kv](https://wwshop.odriverobotics.com/collections/motors/products/odrive-custom-motor-d6374-150kv)
+ - Motor Controller - [ODrive S1](https://wwshop.odriverobotics.com/collections/motor-controllers/products/odrive-s10)
+ - Gearbox - [EG Series Planetary Gearbox Gear Ratio 50:1 Backlash 20arc-min for Nema 34 Stepper Motor](https://www.omc-stepperonline.com/au-on-sale-eg-series-planetary-gearbox-gear-ratio-50-1-backlash-20arc-min-for-nema-34-stepper-motor-au-eg34-g50)
+ - Load Cell - [DACell UU-K50 (D2311047)](https://appliedmeasurement.com.au/product/ama-xtran-load-cells/)
+
+## Mechanical Changes
+ - Drilled new hole in Motor Swing arm inline with AFO upright. 
+ - New pin for motor swing arm reduce backlash
+ - Shorted connecting rod bewteen Motor Swing arm and AFO upright.
+ - Made gearbox mounting plate to adapt new [EG Series Planetary Gearbox Gear Ratio 50:1 Backlash 20arc-min for Nema 34 Stepper Motor](https://www.omc-stepperonline.com/au-on-sale-eg-series-planetary-gearbox-gear-ratio-50-1-backlash-20arc-min-for-nema-34-stepper-motor-au-eg34-g50)
+ 
+## Electrical Changes
+ - New Motor with BLDC motor controller
+ - E-Stop with magnetic reed swtich that pulls nRST low to reset the motor controller.
+    
+    <span style="color: red">__NOTE: Door needs to be shut in order to connect to the motor controller__</span>
+
 # requirements.txt
 
 - aiohappyeyeballs==2.4.0

@@ -384,8 +384,9 @@ class MyInterface:
                 self.odrive_controller.clear_errors()
                 self.update_terminal("ODrive connected successfully.\n")
                 
-                # Enable Start button now that system is connected
-                self.buttons[1].configure(state="normal")  # Index 1 is the "Start" button
+                # Enable Start button now that system is connected (only if not in manual mode)
+                if not self.manual_mode.get():
+                    self.buttons[1].configure(state="normal")  # Index 1 is the "Start" button
                 
                 # Set control mode only if odrive_controller is connected
                 if self.odrive_controller:
@@ -465,6 +466,16 @@ class MyInterface:
         # Angle Limits (in turns)
         self.angle_limits = [-min_angle, max_angle]  # Arm will oscillate between these angles
 
+    def disconnect_odrive(self):
+        """Disconnect from ODrive safely"""
+        try:
+            if hasattr(self, 'odrive_controller') and self.odrive_controller:
+                # Set ODrive State to Idle
+                self.odrive_controller.axis0.requested_state = AXIS_STATE_IDLE
+                self.update_terminal("ODrive disconnected and set to idle state\n")
+        except Exception as e:
+            self.update_terminal(f"Error disconnecting ODrive: {e}\n")
+
     def monitor_odrive_connection():
         # Unused function - can be removed
         while odrive is not None:
@@ -491,8 +502,8 @@ class MyInterface:
             max_angle_degrees = float(self.max_angle_input.get())
             
             # Convert degrees to turns (corrected factor based on actual measurements)
-            min_angle_turns = min_angle_degrees / 2.055  # Fine-tuned factor: 15°input → 14.905°actual
-            max_angle_turns = max_angle_degrees / 2.055  # Fine-tuned factor: 15°input → 14.905°actual
+            min_angle_turns = min_angle_degrees / 2.055  # Fine-tuned factor
+            max_angle_turns = max_angle_degrees / 2.055  # Fine-tuned factor
             
             # Calculate absolute positions by adding to starting position
             # Min is negative from starting position, max is positive
@@ -552,8 +563,8 @@ class MyInterface:
             self.stop_strain_test()
             self.update_terminal("Strain test stopped\n")
         
-        # Return motor to starting position if connected
-        if self.odrive_controller:
+        # Return motor to starting position if connected and NOT in manual mode
+        if self.odrive_controller and not self.manual_mode.get():
             try:
                 # Return to starting position if we have one
                 if hasattr(self, 'starting_position'):
@@ -584,8 +595,26 @@ class MyInterface:
                 
             except Exception as e:
                 self.update_terminal(f"Error during motor stop sequence: {e}\n")
+        elif self.odrive_controller and self.manual_mode.get():
+            # In manual mode, stop any continuous movement and disengage motor
+            try:
+                # Stop any continuous movement
+                self.stop_continuous_movement()
+                
+                # Set ODrive State to Idle to disengage motor
+                self.odrive_controller.axis0.requested_state = AXIS_STATE_IDLE
+                self.update_terminal("Motor disengaged in manual mode\n")
+                
+                # Disable manual control buttons
+                self.left_arrow.configure(state="disabled")
+                self.right_arrow.configure(state="disabled")
+                self.step_angle_input.configure(state="disabled")
+                self.mode_toggle.configure(state="disabled")
+                
+            except Exception as e:
+                self.update_terminal(f"Error during manual mode stop: {e}\n")
 
-        # Stop any active logging and re-enable input fields
+        # Stop any active logging
         if self.logging_active == True:
             self.logging_active = False
             
@@ -1442,6 +1471,9 @@ class MyInterface:
             self.step_angle_input.configure(state="normal")
             self.mode_toggle.configure(state="normal")
             
+            # Disable Start button in manual mode
+            self.buttons[1].configure(state="disabled")
+            
             # Disable input fields
             self.speed_input.configure(state="disabled")
             self.acceleration_input.configure(state="disabled")
@@ -1454,6 +1486,10 @@ class MyInterface:
             self.right_arrow.configure(state="disabled")
             self.step_angle_input.configure(state="disabled")
             self.mode_toggle.configure(state="disabled")
+            
+            # Enable Start button when not in manual mode (only if connected)
+            if hasattr(self, 'odrive_controller') and self.odrive_controller:
+                self.buttons[1].configure(state="normal")
             
             # Enable input fields
             self.speed_input.configure(state="normal")
